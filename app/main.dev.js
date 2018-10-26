@@ -10,7 +10,8 @@
  *
  * @flow
  */
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
+import douyu from 'douyu';
 import MenuBuilder from './menu';
 
 let mainWindow = null;
@@ -29,7 +30,50 @@ if (
   const p = path.join(__dirname, '..', 'app', 'node_modules');
   require('module').globalPaths.push(p);
 }
+// const danmu = () => {
+//   setInterval(() => {});
+// };
+// 异步
+ipcMain.on('asynchronous-message', (event, arg) => {
+  // console.log(`初始化直播间${arg || 2009}`); // prints "ping"
+  const roomID = arg || 2009;
+  const room = new douyu.ChatRoom(roomID);
+  // System level events handler
+  room.on('connect', message => {
+    const huifu = `DouyuTV ChatRoom #${roomID} connected.`;
+    event.sender.send('asynchronous-reply', huifu);
+  });
+  room.on('error', error => {
+    event.sender.send('asynchronous-reply', error.toString());
+    // console.error('Error: ' + error.toString());
+  });
+  room.on('close', hasError => {
+    const ss = `DouyuTV ChatRoom #${roomID} disconnected${hasError}`
+      ? ' because of error.'
+      : '.';
+    event.sender.send('asynchronous-reply', ss);
+    // console.log(
 
+    // );
+  });
+
+  // Chat server events
+  room.on('chatmsg', message => {
+    const danmu = `[${message.nn}]: ${message.txt}`;
+    event.sender.send('asynchronous-reply', danmu);
+  });
+
+  // Knock, knock ...
+  room.open();
+
+  // 给客户端发请求
+  // event.sender.send('asynchronous-reply', '123');
+});
+// 同步
+ipcMain.on('synchronous-message', (event, arg) => {
+  console.log(arg, 2); // prints "ping"
+  event.returnValue = 'pong';
+});
 const installExtensions = async () => {
   const installer = require('electron-devtools-installer');
   const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
@@ -59,7 +103,7 @@ app.on('ready', async () => {
   ) {
     await installExtensions();
   }
-
+  // 开一个新窗口
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,

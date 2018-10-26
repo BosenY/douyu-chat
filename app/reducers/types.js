@@ -5,7 +5,8 @@ export type counterStateType = {
 };
 
 export type Action = {
-  +type: string
+  +type: string,
+  text?: string
 };
 
 export type GetState = () => counterStateType;

@@ -1,6 +1,7 @@
 .container {
-  position: absolute;
-  top: 30%;
+  /* position: absolute; */
+
+  /* top: 30%; */
   left: 10px;
   text-align: center;
 }
@@ -11,4 +12,10 @@
 
 .container a {
   font-size: 1.4rem;
+}
+.container .danmulist {
+  height: 200px;
+  overflow: scroll;
+  width: 600px;
+  border: 1px solid #000;
 }

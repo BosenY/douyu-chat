@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import { ipcRenderer } from 'electron';
 import styles from './Counter.css';
 import routes from '../constants/routes';
 
@@ -14,6 +15,26 @@ type Props = {
 
 export default class Counter extends Component<Props> {
   props: Props;
+
+  constructor(props) {
+    super(props);
+  }
+
+  initDouyu() {
+    const res = ipcRenderer.sendSync('synchronous-message', '1113121');
+    console.log(res);
+  }
+
+  initAsyncDouyu() {
+    ipcRenderer.send('asynchronous-message', 2009);
+  }
+
+  componentDidMount() {
+    ipcRenderer.on('asynchronous-reply', (event, arg) => {
+      // console.log(232);
+      console.log(arg); // prints "pong"
+    });
+  }
 
   render() {
     const {
@@ -33,8 +54,11 @@ export default class Counter extends Component<Props> {
         <div className={`counter ${styles.counter}`} data-tid="counter">
           {counter}
         </div>
+
         <div className={styles.btnGroup}>
-          <button
+          <button onClick={this.initDouyu}>douyu</button>
+          <button onClick={this.initAsyncDouyu}>async douyu </button>
+          {/* <button
             className={styles.btn}
             onClick={increment}
             data-tclass="btn"
@@ -49,8 +73,8 @@ export default class Counter extends Component<Props> {
             type="button"
           >
             <i className="fa fa-minus" />
-          </button>
-          <button
+          </button> */}
+          {/* <button
             className={styles.btn}
             onClick={incrementIfOdd}
             data-tclass="btn"
@@ -65,7 +89,7 @@ export default class Counter extends Component<Props> {
             type="button"
           >
             async
-          </button>
+          </button> */}
         </div>
       </div>
     );
